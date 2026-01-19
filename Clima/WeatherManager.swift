@@ -8,11 +8,19 @@
 
 import Foundation
 
+protocol WeatherManagerDelegate {
+    
+    func didUpdateWeather(weather: WeatherModel)
+    
+}
+
 struct WeatherManager {
     
     // I avoid hard-coding API keys when uploading projects to GitHub!
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=_PASTE_MY_ACTUAL_API_KEY_HERE_&units=metric"
     
+    var delegate: WeatherManagerDelegate?
+
     func fetchWeather(cityName: String) {
         
         let urlString = "\(weatherURL)&q=\(cityName)"
@@ -37,7 +45,11 @@ struct WeatherManager {
                 
                 if let safeData = data {
                     
-                    parseJSON(weatherData: safeData)
+                    if let weather = self.parseJSON(weatherData: safeData) {
+                        
+                        self.delegate?.didUpdateWeather(weather: weather)
+                        
+                    }
                     
                 }
                 
@@ -49,7 +61,7 @@ struct WeatherManager {
         
     }
     
-    func parseJSON(weatherData: Data) {
+    func parseJSON(weatherData: Data) -> WeatherModel? {
         
         let decoder = JSONDecoder()
         
@@ -63,14 +75,13 @@ struct WeatherManager {
 
             let weather = WeatherModel(conditionId: id, cityName: name, temperature: temp)
             
-            print(weather)
-            print(weather.conditionName)
-            print(weather.temperatureString)
+            return weather
 
         }
         catch {
             
             print(error)
+            return nil
             
         }
         
