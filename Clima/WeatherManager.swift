@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol WeatherManagerDelegate {
     
@@ -18,8 +19,9 @@ protocol WeatherManagerDelegate {
 struct WeatherManager {
     
     // I avoid hard-coding API keys when uploading projects to GitHub!
+    // Go to my Open Weather account, log in, search for API Keys and paste it into the URL below!
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather?appid=_PASTE_MY_ACTUAL_API_KEY_HERE_&units=metric"
-    
+
     var delegate: WeatherManagerDelegate?
     
     func fetchWeather(cityName: String) {
@@ -27,6 +29,13 @@ struct WeatherManager {
         let urlString = "\(weatherURL)&q=\(cityName)"
         performRequest(with: urlString)
         
+    }
+    
+    func fetchWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        
+        let urlString = "\(weatherURL)&lat=\(latitude)&lon=\(longitude)"
+        performRequest(with: urlString)
+
     }
     
     func performRequest(with urlString: String) {
